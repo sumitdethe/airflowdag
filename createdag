@@ -1,0 +1,33 @@
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+PROJECT_ID = "eighth-epigram-462408-d6"
+ZONE = "us-central1-a"
+CLUSTER = "airflow"
+NODE_POOL = "airflow-dag"
+NEW_SIZE = 2  # You can change this to current_size + 1
+
+default_args = {
+    "start_date": datetime(2023, 1, 1),
+}
+
+with DAG(
+    dag_id="resize_gke_nodepool",
+    default_args=default_args,
+    schedule=None,  # Manual trigger
+    catchup=False,
+    tags=["gke", "infra"],
+) as dag:
+
+    resize_nodepool = BashOperator(
+        task_id="resize_node_pool",
+        bash_command=f"""
+        gcloud container clusters resize {CLUSTER} \
+          --node-pool {NODE_POOL} \
+          --num-nodes={NEW_SIZE} \
+          --zone {ZONE} \
+          --project {PROJECT_ID} \
+          --quiet
+        """,
+    )

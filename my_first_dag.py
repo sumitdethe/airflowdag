@@ -2,17 +2,18 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
 
-def hello_airflow():
-    print("Hello from your first DAG!")
+def hello_world():
+    print("Hello from KubernetesExecutor 👋")
 
 with DAG(
-    dag_id='my_first_dag',
+    dag_id="hello_world_k8s",
     start_date=datetime(2023, 1, 1),
+    schedule_interval=None,  # Manual trigger only
     catchup=False,
-    tags=["example"]
-    # No schedule → manual trigger only
+    tags=["kubernetes"],
 ) as dag:
-    task1 = PythonOperator(
-        task_id='say_hello',
-        python_callable=hello_airflow
+
+    hello_task = PythonOperator(
+        task_id="say_hello",
+        python_callable=hello_world,
     )

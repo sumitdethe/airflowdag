@@ -1,18 +1,27 @@
 from airflow.decorators import dag, task
 from datetime import datetime
+import subprocess
 
 @dag(
     dag_id="hello_world_k8s",
     start_date=datetime(2023, 1, 1),
-    schedule=None,            # Manual trigger only
+    schedule=None,
     catchup=False,
     tags=["example", "k8s"],
 )
 def hello_world_dag():
+
     @task
     def print_hello():
         print("👋 Hello from Airflow 3.0 on GKE with KubernetesExecutor!")
 
-    print_hello()
+    @task
+    def list_gke_clusters():
+        result = subprocess.run(["gcloud", "container", "clusters", "list"], capture_output=True, text=True)
+        print(result.stdout)
+        if result.stderr:
+            print("Errors:", result.stderr)
+
+    print_hello() >> list_gke_clusters()
 
 dag = hello_world_dag()

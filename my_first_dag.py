@@ -10,7 +10,6 @@ import subprocess
     tags=["example", "k8s"],
 )
 def hello_world_dag():
-
     @task
     def print_hello():
         print("👋 Hello from Airflow 3.0 on GKE with KubernetesExecutor!")
@@ -22,6 +21,8 @@ def hello_world_dag():
         if result.stderr:
             print("Errors:", result.stderr)
 
+    # Explicit task chaining
     print_hello() >> list_gke_clusters()
 
+# Set DAG object
 dag = hello_world_dag()

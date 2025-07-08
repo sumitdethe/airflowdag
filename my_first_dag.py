@@ -14,7 +14,13 @@ def hello_world_dag():
     def print_hello():
         print("👋 Hello from Airflow 3.0 on GKE with KubernetesExecutor!")
 
-    @task
+    @task(
+        executor_config={
+            "KubernetesExecutor": {
+                "image": "google/cloud-sdk:slim"  # You can also use `:latest`
+            }
+        }
+    )
     def list_gke_clusters():
         try:
             result = subprocess.run(
